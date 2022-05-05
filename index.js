@@ -13,7 +13,7 @@ const background = new Sprite({
     x: 0,
     y: 0
   },
-  imageSrc: './img/background.png'
+  imageSrc: './img/background2.png'
 })
 
 const shop = new Sprite({
@@ -21,7 +21,7 @@ const shop = new Sprite({
     x: 600,
     y: 128
   },
-  imageSrc: './img/shop.png',
+  imageSrc: './img/shop2.png',
   scale: 2.75,
   framesMax: 6
 })
@@ -39,41 +39,61 @@ const player = new Fighter({
     x: 0,
     y: 0
   },
-  imageSrc: './img/samuraiMack/Idle.png',
-  framesMax: 8,
-  scale: 2.5,
+  imageSrc: './img/Hero3/_Idle.png',
+  framesMax: 10,
+  scale: 3.1,
   offset: {
-    x: 215,
-    y: 157
+    x: 150,
+    y: 97
   },
   sprites: {
     idle: {
-      imageSrc: './img/samuraiMack/Idle.png',
-      framesMax: 8
+      imageSrc: './img/Hero3/_Idle.png',
+      framesMax: 10
     },
     run: {
-      imageSrc: './img/samuraiMack/Run.png',
-      framesMax: 8
+      imageSrc: './img/Hero3/_Run.png',
+      framesMax: 10
     },
     jump: {
-      imageSrc: './img/samuraiMack/Jump.png',
-      framesMax: 2
+      imageSrc: './img/Hero3/_Jump.png',
+      framesMax: 3
     },
     fall: {
-      imageSrc: './img/samuraiMack/Fall.png',
-      framesMax: 2
+      imageSrc: './img/Hero3/_Fall.png',
+      framesMax: 3
     },
     attack1: {
-      imageSrc: './img/samuraiMack/Attack1.png',
-      framesMax: 6
-    },
-    takeHit: {
-      imageSrc: './img/samuraiMack/Take Hit - white silhouette.png',
+      imageSrc: './img/Hero3/_Attack.png',
       framesMax: 4
     },
+    attack2: {
+      imageSrc: './img/Hero3/_AttackCombo.png',
+      framesMax: 10
+    },
+    takeHit: {
+      imageSrc: './img/Hero3/_Hit.png',
+      framesMax: 1
+    },
     death: {
-      imageSrc: './img/samuraiMack/Death.png',
-      framesMax: 6
+      imageSrc: './img/Hero3/_DeathNoMovement.png',
+      framesMax: 10
+    },
+    turnaround: {
+      imageSrc: './img/Hero3/_TurnAround.png',
+      framesMax: 3
+    },
+    crouch: {
+      imageSrc: './img/Hero3/_Crouch.png',
+      framesMax: 1
+    },
+    crouchTrans: {
+      imageSrc: './img/Hero3/_CrouchTransition.png',
+      framesMax: 1
+    },
+    crouchwalk: {
+      imageSrc: './img/Hero3/_CrouchWalk.png',
+      framesMax: 8
     }
   },
   attackBox: {
@@ -100,7 +120,7 @@ const enemy = new Fighter({
     x: -50,
     y: 0
   },
-  imageSrc: './img/kenji/Idle.png',
+  imageSrc: './img/Hero2/Idle.png',
   framesMax: 4,
   scale: 2.5,
   offset: {
@@ -109,32 +129,36 @@ const enemy = new Fighter({
   },
   sprites: {
     idle: {
-      imageSrc: './img/kenji/Idle.png',
+      imageSrc: './img/Hero2/Idle.png',
       framesMax: 4
     },
     run: {
-      imageSrc: './img/kenji/Run.png',
+      imageSrc: './img/Hero2/Run.png',
       framesMax: 8
     },
     jump: {
-      imageSrc: './img/kenji/Jump.png',
+      imageSrc: './img/Hero2/Jump.png',
       framesMax: 2
     },
     fall: {
-      imageSrc: './img/kenji/Fall.png',
+      imageSrc: './img/Hero2/Fall.png',
       framesMax: 2
     },
     attack1: {
-      imageSrc: './img/kenji/Attack1.png',
+      imageSrc: './img/Hero2/Attack1.png',
       framesMax: 4
     },
     takeHit: {
-      imageSrc: './img/kenji/Take hit.png',
+      imageSrc: './img/Hero2/Take hit.png',
       framesMax: 3
     },
     death: {
-      imageSrc: './img/kenji/Death.png',
+      imageSrc: './img/Hero2/Death.png',
       framesMax: 7
+    },
+    turnaround: {
+      imageSrc: './img/Hero3/_TurnAround.png',
+      framesMax: 3
     }
   },
   attackBox: {
@@ -147,13 +171,14 @@ const enemy = new Fighter({
   }
 })
 
-console.log(player)
-
 const keys = {
   a: {
     pressed: false
   },
   d: {
+    pressed: false
+  },
+  s: {
     pressed: false
   },
   ArrowRight: {
@@ -181,7 +206,6 @@ function animate() {
   enemy.velocity.x = 0
 
   // player movement
-
   if (keys.a.pressed && player.lastKey === 'a') {
     player.velocity.x = -5
     player.switchSprite('run')
@@ -191,6 +215,10 @@ function animate() {
   } else {
     player.switchSprite('idle')
   }
+  //CrouchWalk
+  if (keys.d.pressed && keys.s.pressed || keys.a.pressed && keys.s.pressed){
+    player.switchSprite('crouchwalk')
+  }
 
   // jumping
   if (player.velocity.y < 0) {
@@ -198,6 +226,14 @@ function animate() {
   } else if (player.velocity.y > 0) {
     player.switchSprite('fall')
   }
+
+  //Crouching
+  if (keys.s.pressed && player.lastKey === 's') {
+    player.switchSprite('crouch')
+  } 
+  
+
+  //Sliding
 
   // Enemy movement
   if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
@@ -283,9 +319,14 @@ window.addEventListener('keydown', (event) => {
       case 'w':
         player.velocity.y = -20
         break
+      case 's':
+        keys.s.pressed = true
+        player.lastKey = 's'
+        break
       case ' ':
         player.attack()
         break
+      
     }
   }
 
@@ -317,6 +358,9 @@ window.addEventListener('keyup', (event) => {
       break
     case 'a':
       keys.a.pressed = false
+      break
+    case 's':
+      keys.s.pressed = false
       break
   }
 
