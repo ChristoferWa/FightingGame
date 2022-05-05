@@ -4,6 +4,7 @@ class Sprite {
       imageSrc,
       scale = 1,
       framesMax = 1,
+      sound = './sounds/attack.wav',
       offset = { x: 0, y: 0 }
     }) {
       this.position = position
@@ -59,6 +60,7 @@ class Sprite {
       imageSrc,
       scale = 1,
       framesMax = 1,
+      sound,
       offset = { x: 0, y: 0 },
       sprites,
       attackBox = { offset: {}, width: undefined, height: undefined }
@@ -68,7 +70,8 @@ class Sprite {
         imageSrc,
         scale,
         framesMax,
-        offset
+        offset,
+        sound
       })
   
       this.velocity = velocity
@@ -86,6 +89,7 @@ class Sprite {
       }
       this.color = color
       this.isAttacking
+      this.back = false
       this.health = 100
       this.framesCurrent = 0
       this.framesElapsed = 0
@@ -107,27 +111,31 @@ class Sprite {
       this.attackBox.position.x = this.position.x + this.attackBox.offset.x
       this.attackBox.position.y = this.position.y + this.attackBox.offset.y
   
-      // draw the attack box
-      // c.fillRect(
-      //   this.attackBox.position.x,
-      //   this.attackBox.position.y,
-      //   this.attackBox.width,
-      //   this.attackBox.height
-      // )
-  
       this.position.x += this.velocity.x
       this.position.y += this.velocity.y
-  
+      
       // gravity function
       if (this.position.y + this.height + this.velocity.y >= canvas.height - 96) {
         this.velocity.y = 0
         this.position.y = 330
+      } else if (this.position.y + this.height + this.velocity.y >= canvas.height) {
+        this.velocity.y = 0
+        this.position.y = 0
       } else this.velocity.y += gravity
+
+      // Edges
+      if(this.position.x + this.width >= 900){
+        this.position.x = 850 //right
+      }
+      if (this.position.x + this.width <= -150){
+        this.position.x = -200; //Right
+      }
     }
   
     attack() {
       this.switchSprite('attack1')
       this.isAttacking = true
+      
     }
   
     takeHit() {
@@ -234,6 +242,80 @@ class Sprite {
               this.framesCurrent = 0
             }
             break
+            case 'idleRev':
+              if (this.image !== this.sprites.idleRev.image) {
+                this.image = this.sprites.idleRev.image
+                this.framesMax = this.sprites.idleRev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+            case 'runRev':
+              if (this.image !== this.sprites.runRev.image) {
+                this.image = this.sprites.runRev.image
+                this.framesMax = this.sprites.runRev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+            case 'jumpRev':
+              if (this.image !== this.sprites.jumpRev.image) {
+                this.image = this.sprites.jump.image
+                this.framesMax = this.sprites.jump.framesMax
+                this.framesCurrent = 0
+              }
+              break
+      
+            case 'fallRev':
+              if (this.image !== this.sprites.fallRev.image) {
+                this.image = this.sprites.fallRev.image
+                this.framesMax = this.sprites.fallRev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+      
+            case 'attack1Rev':
+              if (this.image !== this.sprites.attack1Rev.image) {
+                this.image = this.sprites.attack1Rev.image
+                this.framesMax = this.sprites.attack1Rev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+      
+            case 'takeHitRev':
+              if (this.image !== this.sprites.takeHitRev.image) {
+                this.image = this.sprites.takeHitRev.image
+                this.framesMax = this.sprites.takeHitRev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+      
+            case 'deathRev':
+              if (this.image !== this.sprites.deathRev.image) {
+                this.image = this.sprites.deathRev.image
+                this.framesMax = this.sprites.deathRev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+              case 'crouchRev':
+              if (this.image !== this.sprites.crouchRev.image) {
+                this.image = this.sprites.crouchRev.image
+                this.framesMax = this.sprites.crouchRev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+              case 'crouchwalkRev':
+              if (this.image !== this.sprites.crouchwalkRev.image) {
+                this.image = this.sprites.crouchwalkRev.image
+                this.framesMax = this.sprites.crouchwalkRev.framesMax
+                this.framesCurrent = 0
+              }
+              break
+              case 'turnaroundRev':
+                if (this.image !== this.sprites.turnaroundRev.image) {
+                  this.image = this.sprites.turnaroundRev.image
+                  this.framesMax = this.sprites.turnaroundRev.framesMax
+                  this.framesCurrent = 0
+                }
+                break
       }
     }
   }

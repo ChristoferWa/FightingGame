@@ -43,7 +43,7 @@ const player = new Fighter({
   framesMax: 10,
   scale: 3.1,
   offset: {
-    x: 150,
+    x: 0,
     y: 97
   },
   sprites: {
@@ -94,6 +94,62 @@ const player = new Fighter({
     crouchwalk: {
       imageSrc: './img/Hero3/_CrouchWalk.png',
       framesMax: 8
+    },
+    idleRev: {
+      imageSrc: './img/Hero3/_Idle Reverse.png',
+      framesMax: 10
+    },
+    runRev: {
+      imageSrc: './img/Hero3/_Run Reverse.png',
+      framesMax: 10
+    },
+    jumpRev: {
+      imageSrc: './img/Hero3/_Jump Reverse.png',
+      framesMax: 3
+    },
+    fallRev: {
+      imageSrc: './img/Hero3/_Fall Reverse.png',
+      framesMax: 3
+    },
+    attack1Rev: {
+      imageSrc: './img/Hero3/_Attack Reverse.png',
+      framesMax: 4
+    },
+    attack2Rev: {
+      imageSrc: './img/Hero3/_AttackCombo Reverse.png',
+      framesMax: 10
+    },
+    takeHitRev: {
+      imageSrc: './img/Hero3/_Hit Reverse.png',
+      framesMax: 1
+    },
+    deathRev: {
+      imageSrc: './img/Hero3/_DeathNoMovement Reverse.png',
+      framesMax: 10
+    },
+    turnaroundRev: {
+      imageSrc: './img/Hero3/_TurnAround Reverse.png',
+      framesMax: 3
+    },
+    crouchRev: {
+      imageSrc: './img/Hero3/_Crouch Reverse.png',
+      framesMax: 1
+    },
+    crouchTransRev: {
+      imageSrc: './img/Hero3/_CrouchTransition Reverse.png',
+      framesMax: 1
+    },
+    crouchwalkRev: {
+      imageSrc: './img/Hero3/_CrouchWalk Reverse.png',
+      framesMax: 8
+    },
+    slide: {
+      imageSrc: './img/Hero3/_Slide.png',
+      framesMax: 2
+    },
+    slideRev: {
+      imageSrc: './img/Hero3/_Slide Reverse.png',
+      framesMax: 2
     }
   },
   attackBox: {
@@ -108,7 +164,7 @@ const player = new Fighter({
 
 const enemy = new Fighter({
   position: {
-    x: 400,
+    x: 550,
     y: 100
   },
   velocity: {
@@ -124,7 +180,7 @@ const enemy = new Fighter({
   framesMax: 4,
   scale: 2.5,
   offset: {
-    x: 215,
+    x: 0,
     y: 167
   },
   sprites: {
@@ -181,6 +237,9 @@ const keys = {
   s: {
     pressed: false
   },
+  w: {
+    pressed: false
+  },
   ArrowRight: {
     pressed: false
   },
@@ -208,32 +267,48 @@ function animate() {
   // player movement
   if (keys.a.pressed && player.lastKey === 'a') {
     player.velocity.x = -5
-    player.switchSprite('run')
+    player.back = true
+    player.switchSprite('runRev')
   } else if (keys.d.pressed && player.lastKey === 'd') {
     player.velocity.x = 5
+    player.back = false
     player.switchSprite('run')
-  } else {
+  } else if (player.back === false){
     player.switchSprite('idle')
+  } else {
+    player.switchSprite('idleRev')
   }
+  
   //CrouchWalk
   if (keys.d.pressed && keys.s.pressed || keys.a.pressed && keys.s.pressed){
     player.switchSprite('crouchwalk')
   }
 
   // jumping
-  if (player.velocity.y < 0) {
+  if (keys.w.pressed && player.back === false) {
     player.switchSprite('jump')
-  } else if (player.velocity.y > 0) {
+  } else if (player.velocity.y > 0 && player.back === false) {
     player.switchSprite('fall')
+  } else if (keys.w.pressed && player.back === true) {
+    player.switchSprite('jumpRev')
+  } else if (player.velocity.y > 0 && player.back === true) {
+    player.switchSprite('fallRev')
   }
 
-  //Crouching
-  if (keys.s.pressed && player.lastKey === 's') {
-    player.switchSprite('crouch')
-  } 
-  
 
+  //Crouching
+  if (keys.s.pressed && player.lastKey === 's' && player.back === true) {
+    player.switchSprite('crouchRev')
+  } else if(keys.s.pressed && player.lastKey === 's' && player.back === false) {
+    player.switchSprite('crouch')
+  }
+  
   //Sliding
+  if (keys.s.pressed && player.lastKey === 'a' && player.back === true) {
+    player.switchSprite('slideRev')
+  } else if(keys.s.pressed && player.lastKey === 'd' && player.back === false) {
+    player.switchSprite('slide')
+  }
 
   // Enemy movement
   if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
@@ -317,6 +392,7 @@ window.addEventListener('keydown', (event) => {
         player.lastKey = 'a'
         break
       case 'w':
+        keys.s.pressed = true
         player.velocity.y = -20
         break
       case 's':
@@ -325,6 +401,7 @@ window.addEventListener('keydown', (event) => {
         break
       case ' ':
         player.attack()
+        audio.play();
         break
       
     }
@@ -355,12 +432,16 @@ window.addEventListener('keyup', (event) => {
   switch (event.key) {
     case 'd':
       keys.d.pressed = false
+      this.player.position
       break
     case 'a':
       keys.a.pressed = false
       break
     case 's':
       keys.s.pressed = false
+      break
+      case 'w':
+      keys.w.pressed = false
       break
   }
 
